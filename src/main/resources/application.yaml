@@ -1,0 +1,50 @@
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+    datasource:
+      platform: postgres
+      url: jdbc:postgresql://192.168.137.128:5432/postgres
+      username: selectel
+      password: selectel
+      driverClassName: org.postgresql.Driver
+#  kafka:
+#    consumer:
+#      auto-offset-reset: earliest
+#      group-id: default_consumer
+#      bootstrap-servers: 192.168.137.128:29092
+#      topic: IN_TOPIC
+#      fetch-max-wait: 5s
+#      fetch-min-size: 10000
+#      max-poll-records: 15000
+#      properties:
+#        max.poll.interval.ms: 600000
+#    producer:
+#      acks: all
+#      bootstrap-servers: 192.168.137.128:29092
+#      topic: OUT_TOPIC
+#      client-id: "kafka-demo"
+#    listener:
+#      concurrency: 4
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: health,prometheus
+#  metrics:
+#    export:
+#      prometheus:
+#        enabled: true
+#    distribution:
+#      percentiles-histogram:
+#        "[http.server.requests]": true
+logging:
+  file:
+    path: logs/data-flow-logs
+    name: data-flow-service.log
