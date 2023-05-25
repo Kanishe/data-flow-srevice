@@ -46,5 +46,5 @@ spring:
 #        "[http.server.requests]": true
 logging:
   file:
-    path: logs/data-flow-logs
+    path: logs
     name: data-flow-service.log

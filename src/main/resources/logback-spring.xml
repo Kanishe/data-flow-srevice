@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+    <springProperty scope="context" name="activeProfile" source="spring.profiles.active"/>
+    <appender name="RollingFile-Appender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>NEUTRAL</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>${LOG_PATH}/${LOG_FILE}</file>
+
+        <encoder
+                class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>
+                %d{dd-MM-yyyy HH:mm:ss.SSS} %-5level ${PID} -- %logger{36}.%M - %msg%n
+            </Pattern>
+        </encoder>
+
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>
+                ${LOG_PATH}/${LOG_FILE}%i
+            </fileNamePattern>
+            <maxIndex>20</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy
+                class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>20MB</maxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <appender name="RollingFile-ErrorAppender"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+
+        <file>${LOG_PATH}/error_${LOG_FILE}</file>
+
+        <encoder
+                class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%d{dd-MM-yyyy HH:mm:ss.SSS} %-5level ${PID} -- %logger{36}.%M - %msg%n
+            </Pattern>
+        </encoder>
+
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${LOG_FILE}%i</fileNamePattern>
+            <maxIndex>20</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy
+                class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>20MB</maxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <appender name="Console-Appender"
+              class="ch.qos.logback.core.ConsoleAppender">
+        <encoder
+                class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level -- %logger{64}.%M - %msg%n
+            </Pattern>
+        </encoder>
+    </appender>
+
+
+    <!--    <appender name="STASH"
+class="net.logstash.logback.appender.LogstashTcpSocketAppender">-->
+    <!--
+<destination>tkliii-oooo.4.esrt.cloud.33.ru:202</destination>-->
+    <!--        <connectionStrategy>-->
+    <!--            <roundRobin>-->
+    <!--                <connectionTTL>5 minutes</connectionTTL>-->
+    <!--            </roundRobin>-->
+    <!--        </connectionStrategy>-->
+
+    <!--        <encoder
+class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">-->
+    <!--            <providers>-->
+    <!--                <mdc/>-->
+    <!--                <context/>-->
+    <!--                <version/>-->
+    <!--                <logLevel/>-->
+    <!--                <loggerName/>-->
+    <!--                <pattern>-->
+    <!--                    <pattern>-->
+    <!--                        <pattern>-->
+    <!--                            {-->
+    <!--                            "adapterName": "kafka-cor-service",-->
+    <!--                            "pid": "${PID}"-->
+    <!--                            }-->
+    <!--                        </pattern>-->
+    <!--                    </pattern>-->
+    <!--                </pattern>-->
+    <!--                <threadName/>-->
+    <!--                <message/>-->
+    <!--                <logstashMarkers/> &lt;!&ndash; Useful so we can
+add extra information for specific log lines as Markers&ndash;&gt;-->
+    <!--                <arguments/> &lt;!&ndash;or through
+StructuredArguments&ndash;&gt;-->
+    <!--                <stackTrace/>-->
+    <!--            </providers>-->
+    <!--        </encoder>-->
+    <!--    </appender>-->
+
+    <logger name="org.example" level="INFO" additivity="false">
+        <appender-ref ref="RollingFile-Appender"/>
+        <appender-ref ref="RollingFile-ErrorAppender"/>
+        <!--        <appender-ref ref="STASH"/>-->
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="RollingFile-Appender"/>
+        <appender-ref ref="RollingFile-ErrorAppender"/>
+        <appender-ref ref="Console-Appender"/>
+        <!--        <appender-ref ref="STASH"/>-->
+    </root>
+</configuration>
