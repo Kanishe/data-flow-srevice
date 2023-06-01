@@ -112,6 +112,7 @@ public class AppConfig {
      * при необходимости.
      * Использование JpaTransactionManager позволяет разработчикам легко управлять транзакциями в приложении на основе
      * JPA, обеспечивая надежность и целостность данных.
+     *
      * @return jpaTransactionManager
      */
     @Bean
