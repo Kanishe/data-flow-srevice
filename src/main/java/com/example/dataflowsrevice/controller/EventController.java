@@ -5,12 +5,15 @@ import com.example.dataflowsrevice.service.EventService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+
 
 @RestController
 @Slf4j
@@ -29,11 +32,15 @@ public class EventController {
     }
 
     @GetMapping
-    public List<Event> getEventsByType(@RequestParam(defaultValue = "") String type,
-                                       @RequestParam(defaultValue = "0") int page,
-                                       @RequestParam(defaultValue = "10") int size) {
-    log.info("{}",eventService.findByType(type, PageRequest.of(0,1)));
-        return eventService.findByType(type, PageRequest.of(page, size));
+    public Slice<Event> getEventsByType(@RequestParam(defaultValue = "") String type,
+                                        @RequestParam(defaultValue = "0") int page,
+                                        @RequestParam(defaultValue = "10") int size,
+                                        @RequestParam ("sort")String sortField) {
+        Slice<Event> resultSet = eventService.findByType(type, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC,sortField)));
+
+        log.info("getEventsByType {}",
+                resultSet.stream().toArray());
+        return eventService.findByType(type, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, sortField)));
     }
 
 

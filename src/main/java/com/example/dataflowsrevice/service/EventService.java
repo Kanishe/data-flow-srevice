@@ -5,6 +5,7 @@ import com.example.dataflowsrevice.repository.EventRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +29,7 @@ public class EventService {
     }
 
 
-    public List<Event> findByType(String type, Pageable pageable) {
+    public Slice<Event> findByType(String type, Pageable pageable) {
         return eventRepository.findByType(type, pageable);
     }
 
