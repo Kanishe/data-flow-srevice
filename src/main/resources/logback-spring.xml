@@ -111,7 +111,7 @@ StructuredArguments&ndash;&gt;-->
         <!--        <appender-ref ref="STASH"/>-->
     </logger>
 
-    <root level="INFO">
+    <root level="DEBUG">
         <appender-ref ref="RollingFile-Appender"/>
         <appender-ref ref="RollingFile-ErrorAppender"/>
         <appender-ref ref="Console-Appender"/>

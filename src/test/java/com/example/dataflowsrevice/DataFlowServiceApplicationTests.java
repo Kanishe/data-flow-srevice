@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class DataFlowSreviceApplicationTests {
+class DataFlowServiceApplicationTests {
 
     @Autowired
     EventController eventController;

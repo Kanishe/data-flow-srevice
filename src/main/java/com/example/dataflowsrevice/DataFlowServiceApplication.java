@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class DataFlowSreviceApplication {
+public class DataFlowServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(DataFlowSreviceApplication.class, args);
+        SpringApplication.run(DataFlowServiceApplication.class, args);
     }
 
 }

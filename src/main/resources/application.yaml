@@ -4,8 +4,10 @@ spring:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   jpa:
     show-sql: true
-    hibernate:
-      ddl-auto: update
+    properties:
+     hibernate:
+       format_sql: true
+       ddl-auto: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
     datasource:
@@ -14,6 +16,8 @@ spring:
       username: selectel
       password: selectel
       driverClassName: org.postgresql.Driver
+
+
 #  kafka:
 #    consumer:
 #      auto-offset-reset: earliest

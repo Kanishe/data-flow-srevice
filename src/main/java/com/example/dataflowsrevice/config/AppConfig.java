@@ -31,9 +31,11 @@ public class AppConfig {
     @Value("${spring.jpa.database-platform}")
     private String hibernateDialect;
 
-    @Value("${spring.jpa.database-platform}")
+    @Value("${spring.jpa.show-sql}")
     private String showSQL;
 
+    @Value("${spring.jpa.properties.hibernate.format_sql}")
+    private String formatSql;
 
     @Bean
     public DataSource dataSource() {
@@ -55,6 +57,7 @@ public class AppConfig {
         Properties properties = new Properties();
         properties.put("hibernate.dialect", hibernateDialect);
         properties.put("jpa.show-sql", showSQL);
+        properties.put("hibernate.format_sql", formatSql);
         return properties;
     }
 
