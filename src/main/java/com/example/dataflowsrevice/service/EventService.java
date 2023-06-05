@@ -1,5 +1,6 @@
 package com.example.dataflowsrevice.service;
 
+import com.example.dataflowsrevice.exceptions.EventNotFoundException;
 import com.example.dataflowsrevice.model.Event;
 import com.example.dataflowsrevice.repository.EventRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -31,6 +33,11 @@ public class EventService {
 
     public Slice<Event> findByType(String type, Pageable pageable) {
         return eventRepository.findByType(type, pageable);
+    }
+
+    public Event findById(Long id){
+       return eventRepository.findById(id)
+               .orElseThrow(()->new EventNotFoundException());
     }
 
     @Transactional
