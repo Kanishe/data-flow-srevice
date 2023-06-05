@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -35,13 +34,14 @@ public class EventService {
         return eventRepository.findByType(type, pageable);
     }
 
-    public Event findById(Long id){
-       return eventRepository.findById(id)
-               .orElseThrow(()->new EventNotFoundException());
+    public Event findById(Long id) {
+        return eventRepository.findById(id)
+                .orElseThrow(() -> new EventNotFoundException());
     }
 
     @Transactional
-    public void save() {
+    public void saveEvent(Event event) {
+        eventRepository.save(event);
     }
 
 }
