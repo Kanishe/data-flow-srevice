@@ -2,6 +2,7 @@ package com.example.dataflowsrevice.controller;
 
 import com.example.dataflowsrevice.model.Event;
 import com.example.dataflowsrevice.service.EventService;
+import com.example.dataflowsrevice.service.KafkaService;
 import com.example.dataflowsrevice.utilities.FakerGen;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
@@ -12,6 +13,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,11 +30,13 @@ import java.util.List;
 public class EventController {
     private final EventService eventService;
     private final FakerGen fakeGeneration;
+    private final KafkaService kafkaService;
 
     @Autowired
-    public EventController(EventService eventService, FakerGen fakeGeneration) {
+    public EventController(EventService eventService, FakerGen fakeGeneration, KafkaService kafkaService) {
         this.eventService = eventService;
         this.fakeGeneration = fakeGeneration;
+        this.kafkaService = kafkaService;
     }
 
     @GetMapping("/all")
@@ -69,8 +74,15 @@ public class EventController {
             event.setBusinessValue(fakeGeneration.faker().hacker().noun());
             event.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
             event.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
-            log.info("New data was inserted {}",eventService.saveEvent(event));
+            log.info("New data was inserted {}", eventService.saveEvent(event));
             eventService.saveEvent(event);
         }
+    }
+
+    @PostMapping("/sentEvent")
+    public Event createEvent(@RequestBody Event event) {
+        Event savedEvent = eventService.saveEvent(event);
+        kafkaService.sendEvent(savedEvent);
+        return savedEvent;
     }
 }

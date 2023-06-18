@@ -5,9 +5,9 @@ spring:
   jpa:
     show-sql: true
     properties:
-     hibernate:
-       format_sql: true
-       ddl-auto: update
+      hibernate:
+        format_sql: true
+        ddl-auto: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
     datasource:
@@ -16,26 +16,24 @@ spring:
       username: selectel
       password: selectel
       driverClassName: org.postgresql.Driver
-
-
-#  kafka:
-#    consumer:
-#      auto-offset-reset: earliest
-#      group-id: default_consumer
-#      bootstrap-servers: 192.168.137.128:29092
-#      topic: IN_TOPIC
-#      fetch-max-wait: 5s
-#      fetch-min-size: 10000
-#      max-poll-records: 15000
-#      properties:
-#        max.poll.interval.ms: 600000
-#    producer:
-#      acks: all
-#      bootstrap-servers: 192.168.137.128:29092
-#      topic: OUT_TOPIC
-#      client-id: "kafka-demo"
-#    listener:
-#      concurrency: 4
+  kafka:
+    consumer:
+      auto-offset-reset: earliest
+      group-id: event_consumer
+      bootstrap-servers: 192.168.137.128:29092
+      topic: IN_TOPIC
+      fetch-max-wait: 5s
+      fetch-min-size: 10000
+      max-poll-records: 15000
+      properties:
+        max.poll.interval.ms: 600000
+    producer:
+      acks: all
+      bootstrap-servers: 192.168.137.128:29092
+      topic: OUT_TOPIC
+      client-id: "data-flow-service"
+    listener:
+      concurrency: 4
 #management:
 #  endpoints:
 #    web:

@@ -40,7 +40,7 @@ public class EventService {
     }
 
     @Transactional
-    public Object saveEvent(Event event) {
+    public Event saveEvent(Event event) {
         return eventRepository.save(event);
     }
 

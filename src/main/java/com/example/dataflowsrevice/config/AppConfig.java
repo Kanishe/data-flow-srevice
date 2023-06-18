@@ -1,41 +1,53 @@
 package com.example.dataflowsrevice.config;
 
+import com.example.dataflowsrevice.model.Event;
 import jakarta.persistence.EntityManagerFactory;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
 import javax.sql.DataSource;
+import java.util.Map;
 import java.util.Properties;
 
 @Configuration
 @PropertySource("classpath:application.yaml")
 public class AppConfig {
+    private final KafkaProperties kafkaProperties;
     @Value("${spring.jpa.datasource.url}")
     private String datasourceUrl;
-
     @Value("${spring.jpa.datasource.username}")
     private String username;
-
     @Value("${spring.jpa.datasource.password}")
     private String password;
-
     @Value("${spring.jpa.datasource.driverClassName}")
     private String driverClass;
-
     @Value("${spring.jpa.database-platform}")
     private String hibernateDialect;
-
     @Value("${spring.jpa.show-sql}")
     private String showSQL;
-
     @Value("${spring.jpa.properties.hibernate.format_sql}")
     private String formatSql;
+    @Value("${spring.kafka.producer.bootstrap-servers}")
+    private String bootstrapServers;
+
+    @Autowired
+    public AppConfig(KafkaProperties kafkaProperties) {
+        this.kafkaProperties = kafkaProperties;
+    }
 
     @Bean
     public DataSource dataSource() {
@@ -49,8 +61,6 @@ public class AppConfig {
 
     /**
      * Настраиваем hibernate
-     *
-     * @return
      */
     @Bean
     protected Properties hibernateProp() {
@@ -124,4 +134,25 @@ public class AppConfig {
         jpaTransactionManager.setEntityManagerFactory(entityManagerFactory);
         return jpaTransactionManager;
     }
+
+    /*Создаем Kafka producer и настриваем */
+    @Bean
+    public Map<String, Object> producerConf() {
+        Map<String, Object> configProp = kafkaProperties.buildProducerProperties();
+        configProp.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        configProp.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configProp.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        return configProp;
+    }
+
+    @Bean
+    public ProducerFactory<String, Event> producerFactory() {
+        return new DefaultKafkaProducerFactory<>(producerConf());
+    }
+
+    @Bean
+    public KafkaTemplate<String, Event> kafkaTemplate(ProducerFactory<String, Event> producerFactory) {
+        return new KafkaTemplate<>(producerFactory);
+    }
 }
+
