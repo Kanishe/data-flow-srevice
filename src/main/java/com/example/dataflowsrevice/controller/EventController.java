@@ -4,6 +4,7 @@ import com.example.dataflowsrevice.model.Event;
 import com.example.dataflowsrevice.service.EventService;
 import com.example.dataflowsrevice.utilities.FakerGen;
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -60,17 +61,16 @@ public class EventController {
 
     //генерилка тестовых данных (запись в БД)
     @PostConstruct
+    @Transactional
     public void addNewEvent() {
-
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10; i++) {
             Event event = new Event();
-            event.setType(fakeGeneration.faker().name().fullName());
-            event.setBusinessValue(fakeGeneration.faker().name().fullName());
+            event.setType(fakeGeneration.faker().company().industry());
+            event.setBusinessValue(fakeGeneration.faker().hacker().noun());
             event.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
             event.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
+            log.info("New data was inserted {}",eventService.saveEvent(event));
             eventService.saveEvent(event);
         }
-        ;
-
     }
 }
