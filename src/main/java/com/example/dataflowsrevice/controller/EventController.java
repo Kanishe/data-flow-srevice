@@ -4,6 +4,10 @@ import com.example.dataflowsrevice.model.Event;
 import com.example.dataflowsrevice.service.EventService;
 import com.example.dataflowsrevice.service.KafkaService;
 import com.example.dataflowsrevice.utilities.FakerGen;
+import com.example.dataflowsrevice.utilities.Mapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,10 +23,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 
 @RestController
@@ -31,15 +40,17 @@ public class EventController {
     private final EventService eventService;
     private final FakerGen fakeGeneration;
     private final KafkaService kafkaService;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public EventController(EventService eventService, FakerGen fakeGeneration, KafkaService kafkaService) {
+    public EventController(EventService eventService, FakerGen fakeGeneration, KafkaService kafkaService, ObjectMapper mapper) {
         this.eventService = eventService;
         this.fakeGeneration = fakeGeneration;
         this.kafkaService = kafkaService;
+        this.objectMapper = mapper;
     }
 
-    @GetMapping("/all")
+    @GetMapping( "/all")
     public List<Event> showAllEvents() {
         return eventService.findAll();
     }
@@ -77,6 +88,25 @@ public class EventController {
             log.info("New data was inserted {}", eventService.saveEvent(event));
             eventService.saveEvent(event);
         }
+    }
+
+    //генерилка тестовых данных Rest (запись в БД)
+    @PostConstruct
+    public void sentRq() throws JsonProcessingException {
+        String urlForRs = "https://reqres.in/api/users/2";
+        String urlForRq = "https://reqres.in/api/users";
+
+        HashMap<String,String>hashMapForRq=new HashMap<>();
+        hashMapForRq.put("animal",fakeGeneration.faker().animal().name());
+        HttpEntity<Map<String,String>>request = new HttpEntity<>(hashMapForRq);
+
+        RestTemplate restTemplate = new RestTemplate();
+        String rQ = restTemplate.postForObject(urlForRq,request,String.class);
+        String rS = restTemplate.getForObject(urlForRs, String.class);
+
+        JsonNode jsonNode = objectMapper.readTree(rQ);
+        log.info("Fake response: {} ", rS);
+        log.info("Fake response after faker rq: {} ", jsonNode.get("animal"));
     }
 
     @PostMapping("/sentEvent")
