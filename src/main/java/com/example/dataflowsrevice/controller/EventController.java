@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
@@ -107,6 +108,12 @@ public class EventController {
         JsonNode jsonNode = objectMapper.readTree(rQ);
         log.info("Fake response: {} ", rS);
         log.info("Fake response after faker rq: {} ", jsonNode.get("animal"));
+    }
+
+    @GetMapping("/getEvents")
+    @ResponseBody
+    public List<Event> getEventRest(){
+        return eventService.findAll();
     }
 
     @PostMapping("/sentEvent")
