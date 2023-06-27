@@ -1,21 +1,24 @@
 package com.example.dataflowsrevice.controller;
 
+import com.example.dataflowsrevice.exceptions.EventNotBeCreated;
 import com.example.dataflowsrevice.model.Event;
 import com.example.dataflowsrevice.service.EventService;
 import com.example.dataflowsrevice.service.KafkaService;
 import com.example.dataflowsrevice.utilities.FakerGen;
-import com.example.dataflowsrevice.utilities.Mapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,10 +34,9 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 
-@RestController
+@RestController // @Controller + @ResponseBody над каждым методом
 @Slf4j
 @RequestMapping("/events")
 public class EventController {
@@ -51,7 +53,7 @@ public class EventController {
         this.objectMapper = mapper;
     }
 
-    @GetMapping( "/all")
+    @GetMapping("/all")
     public List<Event> showAllEvents() {
         return eventService.findAll();
     }
@@ -61,8 +63,8 @@ public class EventController {
                                         @RequestParam(defaultValue = "0") int page,
                                         @RequestParam(defaultValue = "10") int size,
                                         @RequestParam("sort") String sortField) {
-        Slice<Event> resultSet = eventService.findByType(type, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, sortField)));
-
+        Slice<Event> resultSet = eventService.findByType
+                (type, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, sortField)));
         log.info("getEventsByType {}",
                 resultSet.stream().toArray());
         return eventService.findByType(type, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, sortField)));
@@ -97,12 +99,12 @@ public class EventController {
         String urlForRs = "https://reqres.in/api/users/2";
         String urlForRq = "https://reqres.in/api/users";
 
-        HashMap<String,String>hashMapForRq=new HashMap<>();
-        hashMapForRq.put("animal",fakeGeneration.faker().animal().name());
-        HttpEntity<Map<String,String>>request = new HttpEntity<>(hashMapForRq);
+        HashMap<String, String> hashMapForRq = new HashMap<>();
+        hashMapForRq.put("animal", fakeGeneration.faker().animal().name());
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(hashMapForRq);
 
         RestTemplate restTemplate = new RestTemplate();
-        String rQ = restTemplate.postForObject(urlForRq,request,String.class);
+        String rQ = restTemplate.postForObject(urlForRq, request, String.class);
         String rS = restTemplate.getForObject(urlForRs, String.class);
 
         JsonNode jsonNode = objectMapper.readTree(rQ);
@@ -112,14 +114,29 @@ public class EventController {
 
     @GetMapping("/getEvents")
     @ResponseBody
-    public List<Event> getEventRest(){
+    public List<Event> getEventRest() {
         return eventService.findAll();
     }
 
+
     @PostMapping("/sentEvent")
-    public Event createEvent(@RequestBody Event event) {
+    public Event createEvent(@RequestBody @Valid Event event, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            StringBuilder errMessage = new StringBuilder();
+            List<FieldError> errors = bindingResult.getFieldErrors();
+            for (FieldError error:errors){
+                errMessage.append(error.getField())
+                        .append(" - ")
+                        .append(error.getDefaultMessage())
+                        .append(";")
+                        .append("\n");
+            }
+            throw new EventNotBeCreated(errMessage.toString());
+        }
         Event savedEvent = eventService.saveEvent(event);
         kafkaService.sendEvent(savedEvent);
+        log.info("New Event was taken and save to DB : {}", savedEvent);
         return savedEvent;
+
     }
 }
