@@ -17,16 +17,18 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
@@ -36,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 
-@RestController // @Controller + @ResponseBody над каждым методом
+@Controller // @Controller + @ResponseBody над каждым методом
 @Slf4j
 @RequestMapping("/events")
 public class EventController {
@@ -124,7 +126,7 @@ public class EventController {
         if (bindingResult.hasErrors()) {
             StringBuilder errMessage = new StringBuilder();
             List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error:errors){
+            for (FieldError error : errors) {
                 errMessage.append(error.getField())
                         .append(" - ")
                         .append(error.getDefaultMessage())
@@ -137,6 +139,21 @@ public class EventController {
         kafkaService.sendEvent(savedEvent);
         log.info("New Event was taken and save to DB : {}", savedEvent);
         return savedEvent;
-
     }
+
+
+    @GetMapping("/sentNewEventFromForm")
+    public String showForm(Model model) {
+        model.addAttribute("event", new Event());
+        return "register";
+    }
+
+    @PostMapping("/registered")
+    public String submitForm(@ModelAttribute("event") Event event) {
+        Event event1 = eventService.saveEvent(event);
+        kafkaService.sendEvent(event1);
+        log.info("New Event was taken and save to DB : {}", event1);
+        return "register_success";
+    }
+
 }
