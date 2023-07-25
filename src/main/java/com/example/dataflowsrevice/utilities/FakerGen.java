@@ -10,6 +10,7 @@ import java.util.Locale;
 public class FakerGen {
     @Bean
     public Faker faker() {
-        return new Faker(new Locale("ru"));
+        return new Faker(new Locale(System.getenv("LOCAL")));
     }
+
 }

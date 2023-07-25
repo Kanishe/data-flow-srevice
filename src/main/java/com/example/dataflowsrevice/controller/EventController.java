@@ -56,6 +56,7 @@ public class EventController {
     }
 
     @GetMapping("/all")
+    @ResponseBody
     public List<Event> showAllEvents() {
         return eventService.findAll();
     }
