@@ -38,6 +38,8 @@ import java.util.List;
 import java.util.Map;
 
 
+//todo реализовать ркорректунаю работу crud и mvc @RestController or @Controller
+
 @Controller // @Controller + @ResponseBody над каждым методом
 @Slf4j
 @RequestMapping("/events")
@@ -62,6 +64,7 @@ public class EventController {
     }
 
     @GetMapping
+    @ResponseBody
     public Slice<Event> getEventsByType(@RequestParam(defaultValue = "") String type,
                                         @RequestParam(defaultValue = "0") int page,
                                         @RequestParam(defaultValue = "10") int size,
@@ -74,6 +77,7 @@ public class EventController {
     }
 
     @GetMapping("/getById/{id}")
+    @ResponseBody
     public Event getEventById(@PathVariable Long id) {
         Event event = eventService.findById(id);
         log.info("was find event by id: {}",
