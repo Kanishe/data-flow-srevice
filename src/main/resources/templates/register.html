@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org" lang="en">
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="ISO-8859-1">
     <title>User Registration</title>
@@ -11,16 +11,20 @@
             margin: 5px;
             text-align: left;
         }
+
         input[type=text], input[type=password], select {
             display: inline-block;
             width: 200px;
         }
+
         input[type=radio] {
             margin-left: 45px;
         }
+
         input[type=checkbox] {
             margin-right: 190px;
         }
+
         button {
             padding: 5px;
             margin: 10px;
@@ -31,14 +35,14 @@
 <div align="center">
     <h1>Register Event</h1>
 
-    <form th:method="POST" th:action="@{/events/registered}" th:object="${event}">
+    <form th:action="@{/events/registered}" th:method="POST" th:object="${event}">
         <label for="type">Enter type: </label>
-        <input type="text" th:field="*{type}" id="type"/>
+        <input id="type" th:field="*{type}" type="text"/>
 
         <label for="businessValue">business_value:</label>
-        <input type="text" th:field="*{businessValue}" id="businessValue"/>
+        <input id="businessValue" th:field="*{businessValue}" type="text"/>
         <br/>
-        <input type="submit" value="Create event !" id="submit"/>
+        <input id="submit" type="submit" value="Create event !"/>
     </form>
 </div>
 </body>
