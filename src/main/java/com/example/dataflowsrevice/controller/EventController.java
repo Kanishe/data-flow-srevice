@@ -157,7 +157,7 @@ public class EventController {
     public String submitForm(@ModelAttribute("event") Event event) {
         Event event1 = eventService.saveEvent(event);
         kafkaService.sendEvent(event1);
-        log.info("New Event was taken and save to DB : {}", event1);
+        log.info("New event was taken and save to DB : {}", event1);
         return "register_success";
     }
 

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="ISO-8859-1">
+    <meta charset="UTF-8">
     <title>Registration Success</title>
     <style type="text/css">
         span {
@@ -12,11 +13,9 @@
     </style>
 </head>
 <body>
-<div align="center">
-    <h2>Registration Succeeded!</h2>
+    <h1>Registration Succeeded!</h1>
+    <img th:src="@{/images/TacoCloud.png}" alt="Пример картинки">
     <span>Full name:</span><span th:text="${event.type}"></span><br/>
     <span>E-mail:</span><span th:text="${event.businessValue}"></span><br/>
-
-</div>
 </body>
 </html>
